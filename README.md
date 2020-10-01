@@ -7,3 +7,4 @@ This code is run in a virtual environment:
 To activate the virtual environment, type: `source .venv/bin/activate`
 
 To deactivate the virtual environment, type: `deactivate`
+# FRBClassifier
