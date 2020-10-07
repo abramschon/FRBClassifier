@@ -3,11 +3,12 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 def main():
-    #read in example image
-    rfi_file = "../example_data/FETCHRFI.png"
-    l_file = "../example_data/L.png"
+    #read in example image -  a few to choose from
+    frb_file = "../example_data/FRB.jpg"       #de-dispersed freq-time plot FRB from this paper  
+    rfi_file = "../example_data/FETCHRFI.png"   #DM plot for RFI from FETCH paper (Agarwal et al. 2020)
+    l_file = "../example_data/L.png"            #image of an L 
 
-    image = np.asarray(Image.open(rfi_file))
+    image = np.asarray(Image.open(frb_file))
     #display image
     plot_im(image)
     shape = image.shape

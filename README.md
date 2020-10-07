@@ -1,6 +1,6 @@
 # FRB Classifier
 
-This project aims to perform a binary classification: whether observations are fast radio bursts or not.
+This project aims to perform a binary classification: whether observations are *Fast Radio Bursts* or not (typically not means it is *Radio Frequency Interference*).
 
 This code is run in a virtual environment: 
 
