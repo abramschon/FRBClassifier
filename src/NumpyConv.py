@@ -46,7 +46,7 @@ def convolve(image, filter):
     im_h, im_w, im_c = image.shape
     f_h, f_w, f_c = filter.shape
 
-    output = np.zeros((im_h-f_h+1, im_w-f_w+1))
+    output = np.zeros((im_h-f_h+1, im_w-f_w+1),  dtype=int)
 
     for row in range(im_h-f_h+1):
         for col in range(im_w-f_w+1):
