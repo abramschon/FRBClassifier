@@ -4,24 +4,26 @@ from PIL import Image
 
 def main():
     #read in example image
-    image = np.asarray(Image.open("brams_website.png"))
+    image = np.asarray(Image.open("../data/FETCHRFI.png"))
     #display image
     #plot_im(image)
     print(f'Image dimensions {image.shape}')
-
+    
+    print(np.max(image))
     h_layer = np.vstack((np.zeros(3), np.ones(3), np.zeros(3))) #horizontal lines
     v_layer = np.transpose(h_layer)
     h_filter= np.dstack((h_layer,h_layer,h_layer,h_layer))
     v_filter = np.dstack((v_layer,v_layer,v_layer,v_layer))
 
     horisontal = convolve(image, h_filter)
+    print(f'Output image dimensions {horisontal.shape}')
     plot_im(horisontal)
 
     vertical = convolve(image, v_filter)
     plot_im(vertical)
 
 def plot_im(image):
-    plt.imshow(image)   
+    plt.imshow(image, cmap=plt.cm.get_cmap('Greys').reversed())   
     plt.show()
 
 def convolve(image, filter):
