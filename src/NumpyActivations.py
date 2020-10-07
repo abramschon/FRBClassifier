@@ -6,7 +6,8 @@ def main():
         plot(f)
 
 def plot(f):
-    x = np.linspace(-5,5)
+    plt.figure(figsize=(5,5))
+    x = np.linspace(-5,5,100)
     plt.xlim((-5,5))
     plt.ylim((-5,5))
     plt.axhline(0, color='grey', linewidth=0.3)
