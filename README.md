@@ -6,3 +6,4 @@ Included in this repo are some illustrative scripts. These apply the fundamental
 
 - `NumpyConv.py` shows the result of applying 2 simple *convolutional filters/kernels* across an image
 - `NumpyMaxPool.py` shows the result of maxpooling on an image
+- `NumpyActivations.py` plots various activation functions
