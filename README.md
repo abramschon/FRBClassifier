@@ -7,4 +7,5 @@ This code is run in a virtual environment:
 To activate the virtual environment, type: `source .venv/bin/activate`
 
 To deactivate the virtual environment, type: `deactivate`
-# FRBClassifier
+
+There is also some illustrative scripts. For instance code that shows the results of applying a *convolutional filter*, and code that shows the results of applying a *maxpooling layer*.
