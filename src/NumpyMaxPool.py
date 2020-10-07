@@ -18,9 +18,16 @@ def main():
         plot_im(image)                                  #plot original image
         print(f'Image dimensions {image.shape}')                 
         
+        #first round of max pooling
         pooled_im = max_pool(image, pool_dim, stride)   #apply max pooling
         plot_im(pooled_im)                              #plot down-sampled image
-        print(f'Output image dimensions {pooled_im.shape}')
+        print(f'1st maxpool image dimensions {pooled_im.shape}')
+
+        #second round of max pooling
+        pooled_im = max_pool(pooled_im, pool_dim, stride)   #apply max pooling
+        plot_im(pooled_im)                              #plot down-sampled image
+        print(f'2nd maxpool image dimensions {pooled_im.shape}')
+
 
 
 def max_pool(image, pool_dim, stride):
@@ -36,7 +43,7 @@ def max_pool(image, pool_dim, stride):
     for row in range(output_h):
         for col in range(output_w):
             for depth in range(im_c):
-                output[row,col,depth] = int(np.max( image[row*stride:row*stride+p_h, col*stride:col*stride+p_w, depth] ))
+                output[row,col,depth] = np.max( image[row*stride:row*stride+p_h, col*stride:col*stride+p_w, depth] )
                 
     print(output.shape)
     return(output)
