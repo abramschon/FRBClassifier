@@ -8,7 +8,7 @@ def main():
     rfi_file = "../example_data/FETCHRFI.png"   #DM plot for RFI from FETCH paper (Agarwal et al. 2020)
     l_file = "../example_data/L.png"            #image of an L 
 
-    image = image_to_ndarry(l_file)
+    image = image_to_ndarray(l_file)
     #display image
     plot_im(image)
     shape = image.shape
@@ -34,15 +34,11 @@ def main():
 
     print(f'Output image dimensions {horisontal.shape}')
 
-def image_to_ndarry(file_path):
+def image_to_ndarray(file_path):
     return np.asarray(Image.open(file_path))
 
-def plot_im(image, bw=True):
-    if bw:
-        plt.imshow(image, cmap=plt.cm.get_cmap('Greys').reversed())   
-    else:
-        plt.imshow(image)
-
+def plot_im(image):
+    plt.imshow(image, cmap=plt.cm.get_cmap('Greys').reversed())  
     plt.show()
 
 def convolve(image, filter):
