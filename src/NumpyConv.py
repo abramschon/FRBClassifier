@@ -37,8 +37,9 @@ def main():
 def image_to_ndarray(file_path):
     return np.asarray(Image.open(file_path))
 
-def plot_im(image):
-    plt.imshow(image, cmap=plt.cm.get_cmap('Greys').reversed())  
+def plot_im(image,title=""):
+    plt.imshow(image, cmap=plt.cm.get_cmap('Greys').reversed()) 
+    plt.title(title) 
     plt.show()
 
 def convolve(image, filter):
