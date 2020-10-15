@@ -6,4 +6,5 @@ Included in this repo are some illustrative scripts. These apply the fundamental
 
 - `NumpyConv.py` shows the result of applying 2 simple *convolutional filters/kernels* across an image
 - `NumpyMaxPool.py` shows the result of maxpooling on an image
+- `NumpyGlobalAveragePool.py` illustrate global average pooling and compares this to the Keras implementation
 - `NumpyActivations.py` plots various activation functions
