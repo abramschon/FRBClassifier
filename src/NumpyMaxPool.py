@@ -11,8 +11,7 @@ def main():
     files = ["../example_data/L.png" ,          #image of an L 
             "../example_data/FRB.jpg",          #de-dispersed freq-time plot FRB from this paper  
              "../example_data/FETCHRFI.png"]    #DM plot for RFI from FETCH paper (Agarwal et al. 2020)
-    
-    print(files)
+
     for f in files:
         image = image_to_ndarray(f)
         plot_im(image)                                  #plot original image
