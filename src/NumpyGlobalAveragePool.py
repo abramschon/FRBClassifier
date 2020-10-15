@@ -12,7 +12,7 @@ def main():
     
     for f in files:
         image = image_to_ndarray(f)
-        #plot_im(image)                          #plot original image
+        plot_im(image)                          #plot original image
         print(f'Image dimensions {image.shape}')                 
 
         g_a_p = global_average_pool(image)      #apply global average pooling
