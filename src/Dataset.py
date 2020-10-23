@@ -5,47 +5,52 @@ import random as rnd
 import tensorflow as tf
 
 def main():
-  train_ds, val_ds, test_ds = load_data(0.1) #load 10% of the data
+  dataset = Dataset()
+  train_ds, val_ds, test_ds = dataset.get_datasets() #load 10% of the data
 
   #check out the first image
   for img, lab in train_ds.unbatch().take(1):
       visualize(img)
       print(f"Label: {lab}")
 
+class Dataset:
+  def __init__(self, prop=1, batch_size=32):
+    #get file paths for the rfis and frbs
+    rfi_names = tf.io.gfile.glob("data/label_0/*.jpg") #assumes testing from 'root' directiory
+    frb_names = tf.io.gfile.glob("data/label_1/*.jpg")
+    all_names = rfi_names + frb_names
+    rnd.seed(17) #set seed important for reproducibility 
+    rnd.shuffle(all_names) #shuffle names
 
+    #define train, validation, test counts
+    no_total = round(len(all_names)*prop) 
+    self.no_train = round(0.7 * no_total)
+    self.no_val = round(0.15 * no_total)
+    self.no_test = no_total - self.no_train - self.no_val     
 
-def load_data(prop=1):
-  #get file paths for the rfis and frbs
-  rfi_names = tf.io.gfile.glob("data/label_0/*.jpg") #assumes testing from 'root' directiory
-  frb_names = tf.io.gfile.glob("data/label_1/*.jpg")
-  all_names = rfi_names + frb_names
-  rnd.seed(17) #set seed important for reproducibility 
-  rnd.shuffle(all_names) #shuffle names
+    #record steps per batch size
+    self.steps_per_epoch = self.no_train // batch_size     
 
-  #define train, validation, test counts
-  no_total = round(len(all_names)*prop) 
-  no_train = round(0.7 * no_total)
-  no_val = round(0.15 * no_total)
-  no_test = no_total - no_train - no_val          
+    # create datasets of the file names
+    list_ds = tf.data.Dataset.from_tensor_slices(all_names)
+    train_list_ds = list_ds.take(self.no_train)
+    val_list_ds = list_ds.skip(self.no_train).take(self.no_val)
+    test_list_ds = list_ds.skip(self.no_train + self.no_val).take(self.no_test)
 
-  # create datasets of the file names
-  list_ds = tf.data.Dataset.from_tensor_slices(all_names)
-  train_list_ds = list_ds.take(no_train)
-  val_list_ds = list_ds.skip(no_train).take(no_val)
-  test_list_ds = list_ds.skip(no_train + no_val).take(no_test)
+    # create actual datasets
+    AUTOTUNE = tf.data.experimental.AUTOTUNE #read into this more
+    train_ds = train_list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
+    val_ds = val_list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
+    test_ds = test_list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
 
-  # create actual datasets
-  AUTOTUNE = tf.data.experimental.AUTOTUNE #read into this more
-  train_ds = train_list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
-  val_ds = val_list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
-  test_ds = test_list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
+    #configure to be batched, etc.
+    self.train_ds = configure_for_performance(train_ds, batch_size, train=True)
+    self.val_ds = configure_for_performance(val_ds, batch_size)
+    self.test_ds = configure_for_performance(test_ds, batch_size)
 
-  #configure to be batched, etc.
-  train_ds = configure_for_performance(train_ds, train=True)
-  val_ds = configure_for_performance(val_ds)
-  test_ds = configure_for_performance(test_ds)
+  def get_datasets(self):
+    return (self.train_ds, self.val_ds, self.test_ds)
 
-  return train_ds, val_ds, test_ds
 
 
 def configure_for_performance(ds, batch_size=32, train=False): #cache, batch and prefetch data
