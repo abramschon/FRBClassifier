@@ -103,10 +103,7 @@ def crop_2(img):                        #Crops the de-dispersed frequency time g
 def decode_img(img, height=244,width=244):   #reads the compressed file path and creates an image tensor
   img = tf.image.decode_jpeg(img, channels=3) # convert the compressed string to a 3D uint8 tensor
   img = tf.image.convert_image_dtype(img, tf.float32)
-  if img.shape[0] == 689:                   #crop
-    img = crop_1(img)
-  else:
-    img = crop_2(img)
+  img = tf.cond( tf.shape(img)[0] == 689, lambda: crop_1(img), lambda: crop_2(img) ) #crop
   img = tf.image.rgb_to_grayscale(img)      #greyscale
   img = tf.image.resize(img, [height,width])#resize
   return img
