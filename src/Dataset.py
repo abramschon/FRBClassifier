@@ -5,8 +5,8 @@ import random as rnd
 import tensorflow as tf
 
 def main():
-  dataset = Dataset()
-  train_ds, val_ds, test_ds = dataset.get_datasets() #load 10% of the data
+  dataset = Dataset(0.1, [12,12]) #load 10% of the data
+  train_ds, val_ds, test_ds = dataset.get_datasets() 
 
   #check out the first image
   for img, lab in train_ds.unbatch().take(1):
@@ -14,7 +14,7 @@ def main():
       print(f"Label: {lab}")
 
 class Dataset:
-  def __init__(self, prop=1, batch_size=32):
+  def __init__(self, prop=1, im_shape = [244,244],  batch_size=32,):
     #get file paths for the rfis and frbs
     rfi_names = tf.io.gfile.glob("data/label_0/*.jpg") #assumes testing from 'root' directiory
     frb_names = tf.io.gfile.glob("data/label_1/*.jpg")
@@ -38,10 +38,12 @@ class Dataset:
     test_list_ds = list_ds.skip(self.no_train + self.no_val).take(self.no_test)
 
     # create actual datasets
+    self.im_shape = im_shape #shape of each image
     AUTOTUNE = tf.data.experimental.AUTOTUNE #read into this more
-    train_ds = train_list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
-    val_ds = val_list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
-    test_ds = test_list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
+    process = lambda file: process_path(file, im_shape)
+    train_ds = train_list_ds.map(process, num_parallel_calls=AUTOTUNE)
+    val_ds = val_list_ds.map(process, num_parallel_calls=AUTOTUNE)
+    test_ds = test_list_ds.map(process, num_parallel_calls=AUTOTUNE)
 
     #configure to be batched, etc.
     self.train_ds = configure_for_performance(train_ds, batch_size, train=True)
@@ -100,18 +102,18 @@ def crop_1(img):                        #Crops the de-dispersed frequency time g
 def crop_2(img):                        #Crops the de-dispersed frequency time graph for the second type graph
   return tf.image.crop_to_bounding_box(img, 337, 83, 245, 351) 
 
-def decode_img(img, height=244,width=244):   #reads the compressed file path and creates an image tensor
+def decode_img(img, shape=[244,244]):   #reads the compressed file path and creates an image tensor
   img = tf.image.decode_jpeg(img, channels=3) # convert the compressed string to a 3D uint8 tensor
   img = tf.image.convert_image_dtype(img, tf.float32)
   img = tf.cond( tf.shape(img)[0] == 689, lambda: crop_1(img), lambda: crop_2(img) ) #crop
   img = tf.image.rgb_to_grayscale(img)      #greyscale
-  img = tf.image.resize(img, [height,width])#resize
+  img = tf.image.resize(img, shape)#resize
   return img
 
-def process_path(file_path):
+def process_path(file_path, shape=[244,244]):
   label = get_label(file_path)
   img = tf.io.read_file(file_path)      #load the raw data from the file as a string
-  img = decode_img(img)
+  img = decode_img(img, shape)
   return img, label
 
 def visualize(image):                   #convenient function for plotting
