@@ -5,16 +5,19 @@ import random as rnd
 import tensorflow as tf
 
 def main():
-  dataset = Dataset(0.1, [12,12]) #load 10% of the data
+  dataset = Dataset(0.1, [64,64], sd=2) #load 10% of the data and lighten it a bit
   train_ds, val_ds, test_ds = dataset.get_datasets() 
 
   #check out the first image
-  for img, lab in train_ds.unbatch().take(1):
+  for img, lab in train_ds.unbatch().take(3):
       visualize(img)
       print(f"Label: {lab}")
 
 class Dataset:
-  def __init__(self, prop=1, im_shape = [244,244],  batch_size=32,):
+  def __init__(self, prop=1, im_shape = [244,244],  batch_size=32, mean=0, sd=1, seed=42):
+
+    tf.random.set_seed(seed) #this should make training more reproducible? 
+
     #get file paths for the rfis and frbs
     rfi_names = tf.io.gfile.glob("data/label_0/*.jpg") #assumes testing from 'root' directiory
     frb_names = tf.io.gfile.glob("data/label_1/*.jpg")
@@ -40,7 +43,7 @@ class Dataset:
     # create actual datasets
     self.im_shape = im_shape #shape of each image
     AUTOTUNE = tf.data.experimental.AUTOTUNE #read into this more
-    process = lambda file: process_path(file, im_shape)
+    process = lambda file: process_path(file, im_shape, mean, sd)
     train_ds = train_list_ds.map(process, num_parallel_calls=AUTOTUNE)
     val_ds = val_list_ds.map(process, num_parallel_calls=AUTOTUNE)
     test_ds = test_list_ds.map(process, num_parallel_calls=AUTOTUNE)
@@ -59,6 +62,7 @@ def configure_for_performance(ds, batch_size=32, train=False): #cache, batch and
   ds = ds.cache() 
   if train:
     #apparently best practise in Keras is to repeat then batch for training
+    ds = ds.shuffle(10000)
     ds = ds.repeat()
   ds = ds.batch(batch_size)
   ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE) # allows later elements to be prepared while the current element is being processed
@@ -102,22 +106,23 @@ def crop_1(img):                        #Crops the de-dispersed frequency time g
 def crop_2(img):                        #Crops the de-dispersed frequency time graph for the second type graph
   return tf.image.crop_to_bounding_box(img, 337, 83, 245, 351) 
 
-def decode_img(img, shape=[244,244]):   #reads the compressed file path and creates an image tensor
+def decode_img(img, shape=[244,244], mean=0, sd=1):   #reads the compressed file path and creates an image tensor
   img = tf.image.decode_jpeg(img, channels=3) # convert the compressed string to a 3D uint8 tensor
   img = tf.image.convert_image_dtype(img, tf.float32)
+  img = (img - mean) / sd
   img = tf.cond( tf.shape(img)[0] == 689, lambda: crop_1(img), lambda: crop_2(img) ) #crop
   img = tf.image.rgb_to_grayscale(img)      #greyscale
   img = tf.image.resize(img, shape)#resize
   return img
 
-def process_path(file_path, shape=[244,244]):
+def process_path(file_path, shape=[244,244], mean=0, sd=1):
   label = get_label(file_path)
   img = tf.io.read_file(file_path)      #load the raw data from the file as a string
-  img = decode_img(img, shape)
+  img = decode_img(img, shape, mean, sd)
   return img, label
 
-def visualize(image):                   #convenient function for plotting
-  plt.imshow(tf.squeeze(image), vmin=0, vmax=1, cmap='Greys')
+def visualize(image, vmin=0, vmax=1):   #convenient function for plotting
+  plt.imshow(tf.squeeze(image), vmin=vmin, vmax=vmax, cmap='Greys')
   plt.show()
 
 
