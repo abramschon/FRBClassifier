@@ -5,7 +5,7 @@ import random as rnd
 import tensorflow as tf
 
 def main():
-  dataset = Dataset(0.1, [64,64], sd=2) #load 10% of the data and lighten it a bit
+  dataset = Dataset(0.1, [64,80], sd=2) #load 10% of the data and lighten it a bit
   train_ds, val_ds, test_ds = dataset.get_datasets() 
 
   #check out the first image
@@ -14,7 +14,7 @@ def main():
       print(f"Label: {lab}")
 
 class Dataset:
-  def __init__(self, prop=1, im_shape = [244,244],  batch_size=32, mean=0, sd=1, seed=42):
+  def __init__(self, prop=1, im_shape = [224,224],  batch_size=32, mean=0, sd=1, seed=42):
 
     tf.random.set_seed(seed) #this should make training more reproducible? 
 
@@ -58,11 +58,11 @@ class Dataset:
 
 
 
-def configure_for_performance(ds, batch_size=32, train=False): #cache, batch and prefetch data
+def configure_for_performance(ds, batch_size=32, train=False, shuffle=False): #cache, batch and prefetch data
   ds = ds.cache() 
   if train:
     #apparently best practise in Keras is to repeat then batch for training
-    ds = ds.shuffle(10000)
+    if shuffle: ds = ds.shuffle(10000)
     ds = ds.repeat()
   ds = ds.batch(batch_size)
   ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE) # allows later elements to be prepared while the current element is being processed
