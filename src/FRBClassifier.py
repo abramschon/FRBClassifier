@@ -49,8 +49,8 @@ def depth_model(depth, input_shape=(244,244,1)):
         optimizer = 'adam',
         loss = tf.keras.losses.BinaryCrossentropy(), 
         metrics = ['accuracy',
-                    tf.keras.metrics.Precision(), 
-                    tf.keras.metrics.Recall()])
+                    tf.keras.metrics.Precision(name="precision"), 
+                    tf.keras.metrics.Recall(name="accuracy")])
 
     return model
      
@@ -75,8 +75,8 @@ def reg_model(input_shape=(244,244,1)):
         optimizer='adam',
         loss=tf.keras.losses.BinaryCrossentropy(),
         metrics=['accuracy',
-                tf.keras.metrics.Precision(), 
-                tf.keras.metrics.Recall()])
+                tf.keras.metrics.Precision(name="precision"), 
+                tf.keras.metrics.Recall(name="recall")])
     return model   
 
 
