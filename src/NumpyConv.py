@@ -5,10 +5,11 @@ from PIL import Image
 def main():
     #read in example image -  a few to choose from
     frb_file = "../example_data/FRB.jpg"       #de-dispersed freq-time plot FRB from this paper  
+    smol_frb_file = "../example_data/FRBsmol.jpeg"   #smaller de-dispersed freq-time plot FRB from this paper  
     rfi_file = "../example_data/FETCHRFI.png"   #DM plot for RFI from FETCH paper (Agarwal et al. 2020)
     l_file = "../example_data/L.png"            #image of an L 
 
-    image = image_to_ndarray(l_file)
+    image = image_to_ndarray(smol_frb_file)
     #display image
     plot_im(image)
     shape = image.shape
@@ -26,11 +27,12 @@ def main():
     v_filter = np.dstack([v_layer for i in range(shape[2])])
 
     #apply filters to image
+    vertical = convolve(image, v_filter)
+    plot_im(vertical)
+
     horisontal = convolve(image, h_filter)
     plot_im(horisontal)
 
-    vertical = convolve(image, v_filter)
-    plot_im(vertical)
 
     print(f'Output image dimensions {horisontal.shape}')
 

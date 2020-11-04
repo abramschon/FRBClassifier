@@ -10,6 +10,7 @@ def main():
     #read in example images and plot them, and plot their down-sampled counter parts
     files = ["../example_data/L.png" ,          #image of an L 
             "../example_data/FRB.jpg",          #de-dispersed freq-time plot FRB from this paper  
+            "../example_data/FRBsmol.jpeg",          #scaled down de-dispersed freq-time plot FRB from this paper  
              "../example_data/FETCHRFI.png"]    #DM plot for RFI from FETCH paper (Agarwal et al. 2020)
 
     for f in files:
