@@ -14,6 +14,9 @@ def main():
       print(f"Label: {lab}")
 
 class Dataset:
+  """
+    Creates train, validation and test sets
+  """
   def __init__(self, prop=1, im_shape = [224,224],  batch_size=32, mean=0, sd=1, seed=42):
 
     tf.random.set_seed(seed) #this should make training more reproducible? 
@@ -55,7 +58,6 @@ class Dataset:
 
   def get_datasets(self):
     return (self.train_ds, self.val_ds, self.test_ds)
-
 
 
 def configure_for_performance(ds, batch_size=32, train=False, shuffle=False): #cache, batch and prefetch data
