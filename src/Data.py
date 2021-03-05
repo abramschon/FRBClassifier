@@ -7,7 +7,6 @@ def main():
 
   #check out the first image
   for img, id in test.unbatch().take(1):
-      visualize(img)
       print(f"Id: {id}")
 
 def process_images(dir="data", prop=1, im_shape = [224,224], mean=0, sd=1):
